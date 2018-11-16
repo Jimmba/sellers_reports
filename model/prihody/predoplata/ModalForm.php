@@ -14,8 +14,9 @@ class ModalForm{
     private $inputDate;
     private $mags;
     private $prod;
-    private $sum;
-    private $nachto;
+    private $opisanie;
+    private $sumTotal;
+    private $sumPredopl;
     private $action;
     private $changeId;
     private $buttonClass;
@@ -38,8 +39,9 @@ class ModalForm{
         $this->predoplaty = $this->getPredoplaty();
         $this->mags=$m->getArray("mag",null);
         $this->prod=$m->getArray("prod",null);
-        $this->sum=null;
-        $this->nachto=null;
+        $this->opisanie=null;
+        $this->sumTotal=null;
+        $this->sumPredopl=null;
         $this->action="add";
         $this->changeId=null;
         $this->buttonClass="btn-success";
@@ -52,22 +54,23 @@ class ModalForm{
         $db = new DataBase();
         $db->init();
         $db->setQuery("SELECT
-              rashod.id_rashod,
-              dsm.date,
-              dsm.mags_idmag,
-              mags.magname,
-              dsm.sotrudniki_id_prod,
-              sotrudniki.name,
-              rashod.`rashod(x100)`,
-              rashod.kuda
-            FROM rashod
-              INNER JOIN dsm
-                ON rashod.dsm_id_dsm = dsm.id_dsm
-              INNER JOIN mags
-                ON dsm.mags_idmag = mags.idmag
-              INNER JOIN sotrudniki
-                ON dsm.sotrudniki_id_prod = sotrudniki.id_prod
-                WHERE rashod.id_rashod = $id");
+          dsm.id_dsm,
+          dsm.date,
+          mags.magname,
+          sotrudniki.name,
+          prihPredoplata.opisanie,
+          prihPredoplata.id_prod,
+          prihPredoplata.`predoplata(x100)`,
+          prihPredoplata.`vsego_k_oplate(x100)`,
+          prihPredoplata.pogasheno
+        FROM prihPredoplata
+          INNER JOIN dsm
+            ON prihPredoplata.dsm_id_dsm = dsm.id_dsm
+          INNER JOIN sotrudniki
+            ON dsm.sotrudniki_id_prod = sotrudniki.id_prod
+          INNER JOIN mags
+            ON dsm.mags_idmag = mags.idmag
+          WHERE prihPredoplata.idprih = $id");
         $db->doQuery();
         $result = $db->doQuery();
         $res = mysqli_fetch_row($result);
@@ -76,8 +79,9 @@ class ModalForm{
         $this->predoplaty = $this->getPredoplaty();
         $this->mags=$m->getArray("mag",$res[2]);
         $this->prod=$m->getArray("prod",$res[4]);
-        $sum = $res[6]/100;
-
+        $this->sumTotal = $res[7]/100;
+        $this->sumPredopl = $res[6]/100;
+        $this->opisanie = $res[4];
         $this->classModal="change-modal";
         $this->title="Изменить";
         $this->idForm="changeForm";
@@ -85,8 +89,6 @@ class ModalForm{
         require_once ($_SERVER['DOCUMENT_ROOT']."/service/arrayOptionsModal.php");
         //$m = new ArrayOptionsModal;
         //$this->mags=$m->getArray("mag",null);
-        $this->sum=$sum;
-        $this->nachto=$res[7];
         $this->action="change";
         $this->changeId=$id;
         $this->buttonClass="btn-info";
@@ -132,12 +134,21 @@ class ModalForm{
 
         $html= "<option selected value = \"addPredoplata\">Добавить продажу по предоплате</option>";
         require($_SERVER['DOCUMENT_ROOT']."/service/connection.php");
-        $query = "SELECT id_prih, dsm_id_dsm, sotrudniki.surname  FROM prihpredoplata ORDER BY id_prod";
+        $query = "
+        SELECT
+          prihPredoplata.idprih,
+          prihPredoplata.opisanie,
+          prihPredoplata.`predoplata(x100)`,
+          prihPredoplata.`vsego_k_oplate(x100)`
+        FROM prihPredoplata
+        WHERE prihPredoplata.pogasheno <> 1
+        ORDER BY prihPredoplata.idprih";
+
         $DBH = new PDO("mysql:host =$host;dbname=$database",$user,$password);
         $STH=$DBH->query($query);
         while ($row = $STH->fetch()) {
             $html.="
-            <option value = \"$row[id_prih]\"> $row[pogasheno]</option>";
+            <option value = \"$row[idprih]\"> $row[opisanie]</option>";
         }
         return $html;
 
@@ -156,8 +167,8 @@ class ModalForm{
                             <div class=\"modal-body\">
                                 <form action='crud.php' method='post' id = \"$this->idForm\">
                                      <div class=\"form-group input\">
-                                        <label for=\"predoplaty\">Предоплаты:</label>
-                                        <select class=\"form-control\" name = \"predoplaty\">
+                                        <label for=\"predoplaty\">Внесение остатка по предоплате:</label>
+                                        <select class=\"form-control\" name = \"predoplaty\" id = \"predoplata\">
                                             $this->predoplaty
                                         </select>
                                     </div>
@@ -177,15 +188,23 @@ class ModalForm{
                                             $this->prod
                                     </div>
                                      <div class=\"form-group Input\">
-                                        <label for=\"sum\">Сумма</label>
-                                        <input type=\"text\" name = \"sum\" value = \"$this->sum\" class=\"form-control\" id=\"sum\">
+                                        <label for=\"opisanie\">Описание (на что предоплата)</label>
+                                        <input type=\"text\" name = \"opisanie\" value = \"$this->opisanie\" class=\"form-control\" id=\"opisanie\">
+                                    </div>
+                                     <div class=\"form-group Input\">
+                                        <label for=\"sumTotal\">Всего к оплате</label>
+                                        <input type=\"text\" name = \"sumTotal\" value = \"$this->sumTotal\" class=\"form-control\" id=\"sumTotal\">
                                     </div>
                                     <div class=\"form-group input\">
-                                        <label for=\"nachto\">На что</label>
-                                        <input type=\"text\" name = \"nachto\" value = \"$this->nachto\" class=\"form-control\" id=\"nachto\">
+                                        <label for=\"sumPredopl\">Внесено предоплаты</label>
+                                        <input type=\"text\" name = \"sumPredopl\" value = \"$this->sumPredopl\" class=\"form-control\" id=\"sumPredopl\">
+                                    </div>
+                                    <div class=\"form-group input\" type=\"hidden\">
+                                        <label for=\"sumOstatok\">Конечный расчет</label>
+                                        <input type=\"text\" name = \"sumOstatok\" class=\"form-control\" id=\"sumOstatok\">
                                     </div>
                                     <input type=\"hidden\" name = \"action\" value = \"$this->action\" class=\"form-control\">
-                                    <input type=\"hidden\" name = \"id\" value = \"$this->changeId\" class=\"form - control\">
+                                    <input type=\"hidden\" name = \"id\" value = \"$this->changeId\" class=\"form-control\">
                                     <div class=\"modal-footer\">
                                         <button type=\"submit\" class=\"btn $this->buttonClass\" id=\"$this->buttonId\">$this->buttonText</button>
                                         <button type=\"button\" class=\"btn btn-danger\" data-dismiss=\"modal\">Отмена</button>
@@ -204,13 +223,13 @@ class ModalForm{
                         console.log($(this));
                         $.ajax({
                             type: \"POST\",
-                            url: \"model/rashody/crud.php\",
+                            url: \"model/prihody/predoplata/crud.php\",
                             data: data_review,
                             async: false,
                             success: function () {
                                   $(\".modal\").hide();
                                   $(\".modal-backdrop\").hide();
-                                  $(\"#content\").load('model/rashody/data.php'); // скроллбар не добавляется
+                                  $(\"#content\").load('model/prihody/predoplata/data.php'); // скроллбар не добавляется
                                     
                                 console.log(\"add data sucsess\");
                             },
@@ -228,13 +247,13 @@ class ModalForm{
                         console.log($(this));
                         $.ajax({
                             type: \"POST\",
-                            url: \"model/rashody/crud.php\",
+                            url: \"model/prihody/predoplata/crud.php\",
                             data: data_review,
                             async: false,
                             success: function (){
                                 $(\".modal\").hide();
                                 $(\".modal-backdrop\").hide();
-                                $(\"#content\").load('model/rashody/data.php'); // скроллбар не добавляется
+                                $(\"#content\").load('model/prihody/predoplata/data.php'); // скроллбар не добавляется
                                 console.log(\"change sucsess\");
                             },
                             error: function (){
@@ -242,6 +261,46 @@ class ModalForm{
                             }
                         });
                         console.log(\"end\");
+                    });
+                        
+                    $(\"#predoplata\").change(function (e){
+                        e.preventDefault();
+                        //console.log('selected');
+                        var id= $('#predoplata').val();
+                        var method=\"predoplata\";
+                        //console.log($(this));
+                        $.ajax({
+                            type: \"POST\",
+                            url: \"model/prihody/predoplata/selectPredoplata.php\",
+                            data: {
+                                'id': id
+                            },
+                            async: false,
+                            dataType: \"json\",
+                            success: function(data){
+                                // в случае, когда пришло success. Отработало без ошибок
+                                if(data.result == 'success'){
+                                    //console.log(data.sumPredoplata);
+                                    $('#opisanie').val(data.opisanie);
+                                    $('#sumTotal').val(data.sumTotal);
+                                    $('#sumPredopl').val(data.sumPredoplata);
+                                    $('#sumOstatok').val(data.sumOstatok);
+                                    $('#opisanie').prop('disabled', true);
+                                    $('#sumTotal').prop('disabled', true);
+                                    $('#sumPredopl').prop('disabled', true);
+                                    $('#sumOstatok').prop('disabled', true);
+                                }else{
+                                    $('#opisanie').val('');
+                                    $('#sumTotal').val('');
+                                    $('#sumPredopl').val('');
+                                    $('#sumOstatok').val('');
+                                    $('#opisanie').prop('disabled', false);
+                                    $('#sumTotal').prop('disabled', false);
+                                    $('#sumPredopl').prop('disabled', false);
+                                    $('#sumOstatok').prop('disabled', false);
+                                }
+                            }
+                        });
                     });
                 </script>
             ";

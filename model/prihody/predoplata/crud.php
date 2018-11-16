@@ -50,14 +50,16 @@
             $date = $_POST['date'];
             $mag = $_POST['mag'];
             $prod = $_POST['prod'];
-            $sumPr = $_POST['sumPr']*100;
-			$sum = $_POST['sum']*100;
+            $sumTotal = $_POST['sumTotal']*100;
+            $sumPredopl = $_POST['sumPredopl']*100;
+            $opisanie = $_POST['opisanie'];
+            $pogasheno = 0;
             include_once ($_SERVER['DOCUMENT_ROOT']."/service/idDsm.php");//Получаем idDsm, если его нет - создаем.
             $dsm = new idDsm($date, $prod, $mag);
             $dsm = $dsm->getId();
             $id=null;
-            $query = "Insert INTO prihPredoplata values (?,?,?,?)";
-            $data = array($id, $dsm, $sumPr, $sum);
+            $query = "Insert INTO prihPredoplata values (?,?,?,?,?,?,?)";
+            $data = array($id, $dsm, $opisanie, $prod, $sumPredopl, $sumTotal, $pogasheno);
             $STH=$DBH->prepare($query);
             $STH->execute($data);
         }
@@ -75,9 +77,10 @@
             $date = $_POST['date'];
             $mag = $_POST['mag'];
             $prod = $_POST['prod'];
-			$sumPr = $_POST['sumPr']*100;
-            $sum = $_POST['sum']*100;
-			$pogasheno= $_POST['pogasheno']*100;
+            $sumTotal = $_POST['sumTotal']*100;
+            $sumPredopl = $_POST['sumPredopl']*100;
+            $opisanie = $_POST['opisanie'];
+            $pogasheno = 0;
             include_once ($_SERVER['DOCUMENT_ROOT']."/service/idDsm.php");//Получаем idDsm, если его нет - создаем.
             $dsm = new idDsm($date, $prod, $mag);
             $dsm = $dsm->getId();
@@ -85,8 +88,8 @@
             //$db->setQuery("UPDATE rashod SET dsm_id_dsm = 13, `rashod(x100)` = 121212, kuda = '11 патриот Дима' WHERE id_rashod = 12");
             $db->doQuery();*/
 
-            $query = "UPDATE prihodPredoplata SET dsm_id_dsm=?, `predoplata(x100)`=?, `vsego_k_oplate(x100)`= ?, pogasheno = ? WHERE idprih=?";
-            $data = array($dsm, $sumPr, $sum, $pogasheno, $id);
+            $query = "UPDATE prihPredoplata SET dsm_id_dsm=?, opisanie=?, id_prod = ?, `predoplata(x100)`=?, `vsego_k_oplate(x100)`= ?, pogasheno = ? WHERE idprih=?";
+            $data = array($dsm, $opisanie, $prod, $sumPredopl, $sumTotal, $pogasheno, $id);
             $STH=$DBH->prepare($query);
             $STH->execute($data);
         }

@@ -7,7 +7,7 @@
  * Time: 18:41
  */
 class ModalForm{
-    private $hello1;
+    private $hello0;
     private $classModal;
     private $title;
     private $idForm;

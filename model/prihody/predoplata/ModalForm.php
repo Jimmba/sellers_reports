@@ -7,6 +7,7 @@
  * Time: 18:41
  */
 class ModalForm{
+    echo "test";
     private $classModal;
     private $title;
     private $idForm;

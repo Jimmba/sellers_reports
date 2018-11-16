@@ -1,0 +1,33 @@
+html {
+  overflow-y: scroll;
+}
+.pickers {
+  padding-top: 20px;
+}
+.pickers .input-group-text {
+  background-color: #d9edf7;
+  border-color: #bcdff1;
+  color: #31708f;
+}
+.pickers .log-out {
+  text-align: right;
+}
+.reports {
+  padding-bottom: 20px;
+}
+.reports table {
+  margin-top: 20px;
+}
+.reports table th {
+  background-color: #d9edf7;
+  border-color: #bcdff1;
+  color: #31708f;
+}
+.reports .table-striped tbody tr:nth-of-type(even) {
+  background-color: #d9edf7;
+  border-color: #bcdff1;
+}
+.reports .table-striped tbody tr:nth-of-type(odd) {
+  background-color: #ffffff;
+  border-color: #bcdff1;
+}

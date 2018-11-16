@@ -59,6 +59,7 @@ class ModalForm{
           mags.magname,
           sotrudniki.name,
           prihPredoplata.opisanie,
+          prihPredoplata.id_prod,
           prihPredoplata.`predoplata(x100)`,
           prihPredoplata.`vsego_k_oplate(x100)`,
           prihPredoplata.pogasheno
@@ -75,11 +76,11 @@ class ModalForm{
         $res = mysqli_fetch_row($result);
         require_once ($_SERVER['DOCUMENT_ROOT']."/service/arrayOptionsModal.php");
         $m=new arrayOptionsModal();
-        $this->predoplaty = $this->getPredoplaty($this->id);
+        $this->predoplaty = $this->getPredoplaty();
         $this->mags=$m->getArray("mag",$res[2]);
         $this->prod=$m->getArray("prod",$res[4]);
-        $this->sumTotal = $res[6]/100;
-        $this->sumPredopl = $res[5]/100;
+        $this->sumTotal = $res[7]/100;
+        $this->sumPredopl = $res[6]/100;
         $this->opisanie = $res[4];
         $this->classModal="change-modal";
         $this->title="Изменить";
@@ -147,7 +148,7 @@ class ModalForm{
         $STH=$DBH->query($query);
         while ($row = $STH->fetch()) {
             $html.="
-            <option value = \"$row[id_prih]\"> $row[opisanie]</option>";
+            <option value = \"$row[idprih]\"> $row[opisanie]</option>";
         }
         return $html;
 
@@ -167,7 +168,7 @@ class ModalForm{
                                 <form action='crud.php' method='post' id = \"$this->idForm\">
                                      <div class=\"form-group input\">
                                         <label for=\"predoplaty\">Внесение остатка по предоплате:</label>
-                                        <select class=\"form-control\" name = \"predoplaty\">
+                                        <select class=\"form-control\" name = \"predoplaty\" id = \"predoplata\">
                                             $this->predoplaty
                                         </select>
                                     </div>
@@ -198,8 +199,12 @@ class ModalForm{
                                         <label for=\"sumPredopl\">Внесено предоплаты</label>
                                         <input type=\"text\" name = \"sumPredopl\" value = \"$this->sumPredopl\" class=\"form-control\" id=\"sumPredopl\">
                                     </div>
+                                    <div class=\"form-group input\" type=\"hidden\">
+                                        <label for=\"sumOstatok\">Конечный расчет</label>
+                                        <input type=\"text\" name = \"sumOstatok\" class=\"form-control\" id=\"sumOstatok\">
+                                    </div>
                                     <input type=\"hidden\" name = \"action\" value = \"$this->action\" class=\"form-control\">
-                                    <input type=\"hidden\" name = \"id\" value = \"$this->changeId\" class=\"form - control\">
+                                    <input type=\"hidden\" name = \"id\" value = \"$this->changeId\" class=\"form-control\">
                                     <div class=\"modal-footer\">
                                         <button type=\"submit\" class=\"btn $this->buttonClass\" id=\"$this->buttonId\">$this->buttonText</button>
                                         <button type=\"button\" class=\"btn btn-danger\" data-dismiss=\"modal\">Отмена</button>
@@ -256,6 +261,46 @@ class ModalForm{
                             }
                         });
                         console.log(\"end\");
+                    });
+                        
+                    $(\"#predoplata\").change(function (e){
+                        e.preventDefault();
+                        //console.log('selected');
+                        var id= $('#predoplata').val();
+                        var method=\"predoplata\";
+                        //console.log($(this));
+                        $.ajax({
+                            type: \"POST\",
+                            url: \"model/prihody/predoplata/selectPredoplata.php\",
+                            data: {
+                                'id': id
+                            },
+                            async: false,
+                            dataType: \"json\",
+                            success: function(data){
+                                // в случае, когда пришло success. Отработало без ошибок
+                                if(data.result == 'success'){
+                                    //console.log(data.sumPredoplata);
+                                    $('#opisanie').val(data.opisanie);
+                                    $('#sumTotal').val(data.sumTotal);
+                                    $('#sumPredopl').val(data.sumPredoplata);
+                                    $('#sumOstatok').val(data.sumOstatok);
+                                    $('#opisanie').prop('disabled', true);
+                                    $('#sumTotal').prop('disabled', true);
+                                    $('#sumPredopl').prop('disabled', true);
+                                    $('#sumOstatok').prop('disabled', true);
+                                }else{
+                                    $('#opisanie').val('');
+                                    $('#sumTotal').val('');
+                                    $('#sumPredopl').val('');
+                                    $('#sumOstatok').val('');
+                                    $('#opisanie').prop('disabled', false);
+                                    $('#sumTotal').prop('disabled', false);
+                                    $('#sumPredopl').prop('disabled', false);
+                                    $('#sumOstatok').prop('disabled', false);
+                                }
+                            }
+                        });
                     });
                 </script>
             ";

@@ -13,6 +13,8 @@
       dsm.date,
       mags.magname,
       sotrudniki.name,
+      prihPredoplata.idprih,
+      prihPredoplata.opisanie,
       prihPredoplata.`predoplata(x100)`,
       prihPredoplata.`vsego_k_oplate(x100)`,
       prihPredoplata.pogasheno
@@ -38,6 +40,7 @@
                     <th>Дата</th>
                     <th>Магазин</th>
                     <th>Продавец</th>
+                    <th>Описание</th>
                     <th>Сумма предоплаты</th>
                     <th>Всего оплатить</th>
                     <th>Изменить</th>
@@ -46,9 +49,10 @@
             </thead>
             <tbody>";
             while ($row = $STH->fetch()) {
-                $sum += $row["prihPredoplata(x100)"] / 100;
+                $sum += $row["predoplata(x100)"] / 100;
                 printf("
                 <tr>
+                    <td>%s</td>
                     <td>%s</td>
                     <td>%s</td>
                     <td>%s</td>
@@ -70,7 +74,7 @@
                             </button>
                         </form>
                     </td>
-                </tr>", $row["date"], $row["magname"], $row["name"], $row["predoplata(x100)"] / 100, $row["vsego_k_oplate(x100)"] / 100, $row["id_prih"], $row["id_prih"]);
+                </tr>", $row["date"], $row["magname"], $row["name"], $row["opisanie"], $row["predoplata(x100)"] / 100, $row["vsego_k_oplate(x100)"] / 100, $row["idprih"], $row["idprih"]);
             }
             echo"
             </tbody>

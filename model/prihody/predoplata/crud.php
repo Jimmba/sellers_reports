@@ -23,7 +23,31 @@
     if (isset($_SESSION['dateTo'])&&(!empty($_SESSION['dateTo']))){
         $dateTo = $_SESSION['dateTo'];
     }
-
+    if (isset($_SESSION['sumTotal'])&&(!empty($_SESSION['sumTotal']))){
+        $_POST['sumTotal']= $_SESSION['sumTotal'];
+        //Удалить переменную сесиии
+        unset($_SESSION['sumTotal']);
+    }
+    if (isset($_SESSION['sumTotal'])&&(!empty($_SESSION['sumTotal']))){
+        $_POST['sumTotal']= $_SESSION['sumTotal'];
+        //Удалить переменную сесиии
+        unset($_SESSION['sumTotal']);
+    }
+    if (isset($_SESSION['opisanie'])&&(!empty($_SESSION['opisanie']))){
+        $_POST['opisanie']= $_SESSION['opisanie'];
+        //Удалить переменную сесиии
+        unset($_SESSION['opisanie']);
+    }
+    if (isset($_SESSION['sumPredopl'])&&(!empty($_SESSION['sumPredopl']))){
+        $_POST['sumPredopl']= $_SESSION['sumPredopl'];
+        //Удалить переменную сесиии
+        unset($_SESSION['sumPredopl']);
+    }
+    if (isset($_SESSION['sumOstatok'])&&(!empty($_SESSION['sumOstatok']))){
+        $_POST['sumOstatok']= $_SESSION['sumOstatok'];
+        //Удалить переменную сесиии
+        unset($_SESSION['sumOstatok']);
+    }
 
     require_once ($_SERVER['DOCUMENT_ROOT']."/service/Database.php");
     require_once ($_SERVER['DOCUMENT_ROOT']."/service/arrayOptionsModal.php");

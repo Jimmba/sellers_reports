@@ -30,14 +30,14 @@ $session->startSession();
     <div class="row reports">
 		<?include ("menu.php")?>
 		<div id="content" class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12 col-12">
-			<div class="tab-content">
+			<!--<div class="tab-content">-->
 				<?include ($_SERVER['DOCUMENT_ROOT']."/model/report/data.php");?>
 				<?//include ("prihody.php")?>
 				<?//include ("rashody.php")?>
 				<?//include ("vozvraty.php")?>
 				<?//include ("vzp.php")?>
 				<?//include ("akb.php")?>
-			</div>
+			<!--</div>-->
 		</div>
 	</div>
 </div>

@@ -151,7 +151,7 @@ class ModalForm{
                                     </div>
                                      <div class=\"form-group Input\">
                                         <label for=\"sum\">Сумма</label>
-                                        <input type=\"text\" name = \"sum\" value = \"$this->sum\" class=\"form-control\" id=\"sum\">
+                                        <input type=\"number\" step=\"0.01\" name = \"sum\" value = \"$this->sum\" class=\"form-control\" id=\"sum\">
                                     </div>
                                     <input type=\"hidden\" name = \"action\" value = \"$this->action\" class=\"form-control\">
                                     <input type=\"hidden\" name = \"id\" value = \"$this->changeId\" class=\"form - control\">

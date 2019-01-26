@@ -12,6 +12,9 @@ html {
 .pickers .log-out {
   text-align: right;
 }
+.pickers .log-out .log-out-button{
+  margin-bottom: 16px;
+}
 .reports {
   padding-bottom: 20px;
 }

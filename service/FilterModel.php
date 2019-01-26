@@ -11,8 +11,8 @@ class FilterModel{
     private $dateTo;
     private $prod;
     function init(){
-        include_once($_SERVER['DOCUMENT_ROOT']."/service/auth.php");
-        $auth = new auth();
+        include_once($_SERVER['DOCUMENT_ROOT']."/service/Auth.php");
+        $auth = new Auth();
         $auth->init();
         $authName = $auth->getAuthName();
         $authId = $auth->getAuthId();

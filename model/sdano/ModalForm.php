@@ -30,7 +30,7 @@ class ModalForm{
     }
     private function createAddForm(){
         $this->classModal="add-modal";
-        $this->title="Перевод+";
+        $this->title="Сдано";
         $this->idForm="addForm";
         $m = new ArrayOptionsModal;
         $this->mags=$m->getArray("mag",null);
@@ -48,21 +48,21 @@ class ModalForm{
         $db = new DataBase();
         $db->init();
         $db->setQuery("SELECT
-              prihPerevod.id_prih,
+              ostatki.id_ostatki,
               dsm.date,
               dsm.mags_idmag,
               mags.magname,
               dsm.sotrudniki_id_prod,
               sotrudniki.name,
-              prihPerevod.`perevod_sto(x100)`
-            FROM prihPerevod
+              ostatki.`sdano(x100)`
+            FROM ostatki
               INNER JOIN dsm
-                ON prihPerevod.dsm_id_dsm = dsm.id_dsm
+                ON ostatki.dsm_id_dsm = dsm.id_dsm
               INNER JOIN mags
                 ON dsm.mags_idmag = mags.idmag
               INNER JOIN sotrudniki
                 ON dsm.sotrudniki_id_prod = sotrudniki.id_prod
-                WHERE prihPerevod.id_prih= $id");
+                WHERE ostatki.id_ostatki= $id");
         $db->doQuery();
         $result = $db->doQuery();
         $res = mysqli_fetch_row($result);
@@ -173,13 +173,13 @@ class ModalForm{
                         console.log($(this));
                         $.ajax({
                             type: \"POST\",
-                            url: \"model/prihody/perevod/crud.php\",
+                            url: \"model/sdano/crud.php\",
                             data: data_review,
                             async: false,
                             success: function () {
                                   $(\".modal\").hide();
                                   $(\".modal-backdrop\").hide();
-                                  $(\"#content\").load('model/prihody/perevod/data.php'); // скроллбар не добавляется
+                                  $(\"#content\").load('model/sdano/data.php'); // скроллбар не добавляется
                                     
                                 console.log(\"add data sucsess\");
                             },
@@ -197,13 +197,13 @@ class ModalForm{
                         console.log($(this));
                         $.ajax({
                             type: \"POST\",
-                            url: \"model/prihody/perevod/crud.php\",
+                            url: \"model/sdano/crud.php\",
                             data: data_review,
                             async: false,
                             success: function (){
                                 $(\".modal\").hide();
                                 $(\".modal-backdrop\").hide();
-                                $(\"#content\").load('model/prihody/perevod/data.php'); // скроллбар не добавляется
+                                $(\"#content\").load('model/sdano/data.php'); // скроллбар не добавляется
                                 console.log(\"change sucsess\");
                             },
                             error: function (){

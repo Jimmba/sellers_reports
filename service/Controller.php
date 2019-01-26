@@ -9,12 +9,10 @@
 class Controller{
     private $controller;
     private $model;
-    public function run(){//Принимает данные, анализирует их и передает дальше
-
-        //echo 'MainController init<br>';
+    public function run(){
+        //Принимает данные, анализирует их и передает дальше
+        //include_once ("view/index.php");
         include_once("service/MainModel.php");
-
-
 
         $this->model = new MainModel();
         $this->model->init();
@@ -30,6 +28,4 @@ class Controller{
             $this->view->viewData();
         }
     }
-
-
 }

@@ -173,7 +173,7 @@ class ModalForm{
                                     
                                      <div class=\"form-group Input\">
                                         <label for=\"sum\">Сумма</label>
-                                        <input type=\"text\" name = \"sum\" value = \"$this->sum\" class=\"form-control\" id=\"sum\">
+                                        <input type=\"number\" step=\"0.01\" name = \"sum\" value = \"$this->sum\" class=\"form-control\" id=\"sum\">
                                     </div>
                                     <div class=\"form-group input\">
                                         <label for=\"prichina\">Основание</label>

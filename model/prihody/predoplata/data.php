@@ -8,27 +8,34 @@
     // Получаем из сессии $prod, $mag, $dateFrom, $dateTo
     $sessionFilter = new sessionsFilter();
     $where = $sessionFilter->getSelectFilter();//Генерируем where...
+    //$where.=" AND prihPredoplata.`pogasheno(x100)` = 0"; //Выбираем только не погашенные предоплаты
     $query = "SELECT
-      dsm.id_dsm,
-      dsm.date,
-      mags.magname,
-      sotrudniki.name,
-      prihPredoplata.idprih,
-      prihPredoplata.opisanie,
-      prihPredoplata.`predoplata(x100)`,
-      prihPredoplata.`vsego_k_oplate(x100)`,
-      prihPredoplata.pogasheno
-    FROM prihPredoplata
-      INNER JOIN dsm
-        ON prihPredoplata.dsm_id_dsm = dsm.id_dsm
-      INNER JOIN sotrudniki
-        ON dsm.sotrudniki_id_prod = sotrudniki.id_prod
-      INNER JOIN mags
-        ON dsm.mags_idmag = mags.idmag
-      $where
-    GROUP BY prihPredoplata.idprih,
-             sotrudniki.name
-    ORDER BY dsm.date DESC, sotrudniki.name";
+  prihPredoplata.idprih,
+  dsm.id_dsm,
+  dsm.date,
+  mags.magname,
+  sotrudniki.name,
+  prihPredoplata.opisanie,
+  prihPredoplata.`predoplata(x100)`,
+  prihPredoplata.`vsego_k_oplate(x100)`,
+  prihPredoplata.`pogasheno(x100)`,
+  prihPredoplata.dsm_ostatok,
+  sotrudniki_1.name as namePr,
+  dsm_1.date as datePr
+FROM prihPredoplata
+  INNER JOIN dsm
+    ON prihPredoplata.dsm_id_dsm = dsm.id_dsm
+  INNER JOIN sotrudniki
+    ON dsm.sotrudniki_id_prod = sotrudniki.id_prod
+  INNER JOIN mags
+    ON dsm.mags_idmag = mags.idmag
+  INNER JOIN dsm dsm_1
+    ON prihPredoplata.dsm_ostatok = dsm_1.id_dsm
+  INNER JOIN sotrudniki sotrudniki_1
+    ON dsm_1.sotrudniki_id_prod = sotrudniki_1.id_prod
+  INNER JOIN mags mags_1
+    ON dsm_1.mags_idmag = mags_1.idmag
+      $where";
     require($_SERVER['DOCUMENT_ROOT']."/service/connection.php");
     $DBH = new PDO("mysql:host =$host;dbname=$database",$user,$password);
     $STH=$DBH->query($query);
@@ -41,15 +48,46 @@
                     <th>Магазин</th>
                     <th>Продавец</th>
                     <th>Описание</th>
-                    <th>Сумма предоплаты</th>
                     <th>Всего оплатить</th>
+                    <th>Сумма предоплаты</th>
+                    <th>Внесен остаток</th>
+                    <th>Остаток принял</th>
+                    <th>Дата внесения остатка</th>
                     <th>Изменить</th>
                     <th>Удалить</th>
                 </tr>
             </thead>
             <tbody>";
+
             while ($row = $STH->fetch()) {
+                //Запретить изменение, если приход по предоплате создавал другой продавец
+                //Если продавец совпадает или права пользователя use - разрешить редактирование (use исправить на admin)!!!
+
+                if ($row["name"] == $_SESSION['prod'] || $_SESSION['permissions']=="user") {
+                    $editButton = "<button type=\"button\" class=\"btn btn-info loadChangeForm\" data-toggle=\"modal\" data-target=\".change-modal\" id=\"%s\">
+                        <i class=\"fas fa-edit\"></i>
+                        <span>Изменить</span>
+                    </button>";
+                    $deleteButton = "<button type=\"submit\" class=\"btn btn-danger\">
+                        <i class=\"fas fa-trash-alt\"></i>
+                        <span>Удалить</span>
+                    </button>";
+                }else{
+                    $editButton = "<button disabled type=\"button\" class=\"btn btn-info loadChangeForm\" data-toggle=\"modal\" data-target=\".change-modal\" id=\"%s\">
+                        <i class=\"fas fa-edit\"></i>
+                        <span>Изменить</span>
+                    </button>";
+                    $deleteButton = "<button disabled type=\"submit\" class=\"btn btn-danger\">
+                        <i class=\"fas fa-trash-alt\"></i>
+                        <span>Удалить</span>
+                    </button>";
+                }
+
                 $sum += $row["predoplata(x100)"] / 100;
+                if ($row["namePr"]=="nobody"){
+                    $row["namePr"]="";
+                    $row["datePr"]="";
+                }
                 printf("
                 <tr>
                     <td>%s</td>
@@ -58,23 +96,20 @@
                     <td>%s</td>
                     <td>%s</td>
                     <td>%s</td>
+                    <td>%s</td>
+                    <td>%s</td>
+                    <td>%s</td>
                     <td>
-                        <button type=\"button\" class=\"btn btn-info loadChangeForm\" data-toggle=\"modal\" data-target=\".change-modal\" id=\"%s\">
-                            <i class=\"fas fa-edit\"></i>
-                            <span>Изменить</span>
-                        </button>
+                        $editButton
                     </td>
                     <td>
                         <form action='crud.php' method='post' class='deletePredoptala'>
                             <input type=\"hidden\" name=\"action\" value=\"delete\">
                             <input type=\"hidden\" name=\"id\" value=\"%s\">
-                            <button type=\"submit\" class=\"btn btn-danger\">
-                                <i class=\"fas fa-trash-alt\"></i>
-                                <span>Удалить</span>
-                            </button>
+                            $deleteButton
                         </form>
                     </td>
-                </tr>", $row["date"], $row["magname"], $row["name"], $row["opisanie"], $row["predoplata(x100)"] / 100, $row["vsego_k_oplate(x100)"] / 100, $row["idprih"], $row["idprih"]);
+                </tr>", $row["date"], $row["magname"], $row["name"], $row["opisanie"], $row["vsego_k_oplate(x100)"] / 100,  $row["predoplata(x100)"] / 100, $row["pogasheno(x100)"]/100, $row["namePr"], $row["datePr"],$row["idprih"], $row["idprih"]);
             }
             echo"
             </tbody>

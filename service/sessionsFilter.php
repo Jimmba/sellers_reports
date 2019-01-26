@@ -32,17 +32,22 @@
             }else{
                 $this->dateTo = "31.12.2100";
             }
-            $this->getSelectFilter();
+            //$this->getSelectFilter();
         }
         function getSelectFilter(){
             $text = "WHERE ";
             if ($this->prod!="*"){
-                $text.= "sotrudniki.name = \"$this->prod\" AND ";
+                if ($_SESSION[page]=="prihody/predoplata"){
+                    $text.= "(sotrudniki.name = \"$this->prod\" OR sotrudniki_1.name = \"$this->prod\") AND ";
+                }else{
+                    $text.= "sotrudniki.name = \"$this->prod\" AND ";
+                }
             }
             if ($this->mag!="*"){
                 $text.= "mags.magname = \"$this->mag\" AND ";
             }
-            $text.= "dsm.date BETWEEN \"$this->dateFrom\" AND \"$this->dateTo\"";
+            $text.= "(dsm.date BETWEEN \"$this->dateFrom\" AND \"$this->dateTo\")";
+            //$text.= "((dsm.date BETWEEN \"$this->dateFrom\" AND \"$this->dateTo\") OR (dsm_1.date BETWEEN \"$this->dateFrom\" AND \"$this->dateTo\"))";
             return $text;
         }
     }

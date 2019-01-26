@@ -43,10 +43,20 @@
         //Удалить переменную сесиии
         unset($_SESSION['sumPredopl']);
     }
+
+    if (isset($_SESSION['id'])&&(!empty($_SESSION['id']))){
+        $id= $_SESSION['id'];
+        //Удалить переменную сесиии
+        unset($_SESSION['id']);
+    }
+
+
     if (isset($_SESSION['sumOstatok'])&&(!empty($_SESSION['sumOstatok']))){
         $_POST['sumOstatok']= $_SESSION['sumOstatok'];
         //Удалить переменную сесиии
         unset($_SESSION['sumOstatok']);
+    }else{
+        $_POST['sumOstatok']=0;
     }
 
     require_once ($_SERVER['DOCUMENT_ROOT']."/service/Database.php");
@@ -77,20 +87,36 @@
             $sumTotal = $_POST['sumTotal']*100;
             $sumPredopl = $_POST['sumPredopl']*100;
             $opisanie = $_POST['opisanie'];
-            $pogasheno = 0;
             include_once ($_SERVER['DOCUMENT_ROOT']."/service/idDsm.php");//Получаем idDsm, если его нет - создаем.
             $dsm = new idDsm($date, $prod, $mag);
             $dsm = $dsm->getId();
-            $id=null;
-            $query = "Insert INTO prihPredoplata values (?,?,?,?,?,?,?)";
-            $data = array($id, $dsm, $opisanie, $prod, $sumPredopl, $sumTotal, $pogasheno);
-            $STH=$DBH->prepare($query);
-            $STH->execute($data);
+
+            if ($_POST['sumOstatok']==0){
+                //Добавляем новую строку
+                $id=null;
+                $dsm_ostatok=0;
+                $pogasheno = 0;
+                $query = "Insert INTO prihPredoplata values (?,?,?,?,?,?,?,?)";
+                $data = array($id, $dsm, $opisanie, $prod, $sumPredopl, $sumTotal, $pogasheno, $dsm_ostatok);
+                $STH=$DBH->prepare($query);
+                $STH->execute($data);
+            }else{
+                //Закрываем предоплату
+                // $id=$id;
+                $pogasheno=$_POST['sumOstatok']*100;
+                $dsm_ostatok=$dsm;
+                //$query = "UPDATE prihPredoplata SET dsm_id_dsm=?, opisanie=?, id_prod = ?, `predoplata(x100)`=?, `vsego_k_oplate(x100)`= ?, `pogasheno(x100)` = ?, dsm_ostatok = ? WHERE idprih=?";
+                //$data = array($dsm, $opisanie, $prod, $sumPredopl, $sumTotal, $pogasheno, $id, $dsmClose);
+                $query = "UPDATE prihPredoplata SET `pogasheno(x100)` = ?, dsm_ostatok = ? WHERE idprih=?";
+                $data = array($pogasheno, $dsm_ostatok, $id);
+                $STH=$DBH->prepare($query);
+                $STH->execute($data);
+            }
         }
         if ($action == "delete") {
             //Удаление данных в БД
             $id = $_POST['id'];
-            $db->setQuery("DELETE FROM prihPredoplata WHERE id_rashod = $id");
+            $db->setQuery("DELETE FROM prihPredoplata WHERE idprih = $id");
             $result = $db->doQuery();
 
         }
@@ -112,7 +138,7 @@
             //$db->setQuery("UPDATE rashod SET dsm_id_dsm = 13, `rashod(x100)` = 121212, kuda = '11 патриот Дима' WHERE id_rashod = 12");
             $db->doQuery();*/
 
-            $query = "UPDATE prihPredoplata SET dsm_id_dsm=?, opisanie=?, id_prod = ?, `predoplata(x100)`=?, `vsego_k_oplate(x100)`= ?, pogasheno = ? WHERE idprih=?";
+            $query = "UPDATE prihPredoplata SET dsm_id_dsm=?, opisanie=?, id_prod = ?, `predoplata(x100)`=?, `vsego_k_oplate(x100)`= ?, `pogasheno(x100)` = ? WHERE idprih=?";
             $data = array($dsm, $opisanie, $prod, $sumPredopl, $sumTotal, $pogasheno, $id);
             $STH=$DBH->prepare($query);
             $STH->execute($data);

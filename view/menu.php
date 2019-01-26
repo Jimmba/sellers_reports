@@ -27,6 +27,9 @@
 		<li class="nav-item">
 			<a class="nav-link" data-toggle="tab" href="#vzp" role="tab" id="vzp">В з/п</a>
 		</li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#sdano" role="tab" id="sdano">Сдано</a>
+        </li>
 		<li class="nav-item">
 			<a class="nav-link" data-toggle="tab" href="#akb" role="tab" id="akb">Аккумуляторы</a>
 		</li>

@@ -7,6 +7,7 @@ $(document).ready(function() {
         sellerInput,
         buildingInput;
 
+
     $('#start-date').on('change', function () {
         startDateInput = $('#start-date').val();
         changeFilter("dateFrom",startDateInput);
@@ -58,9 +59,15 @@ $(document).ready(function() {
 	$('#vzp').click(function(){
 		$("#content").load('model/vzp/data.php');
 	});
+    $('#sdano').click(function(){
+        $("#content").load('model/sdano/data.php');
+    });
 	$('#akb').click(function(){
 		$("#content").load('model/akb.php');
 	});
+
+    getMoney();
+    setInterval(getMoney, 1000);
 
     function changeFilter($type, $value) {
         var filterType = $type;
@@ -86,71 +93,91 @@ $(document).ready(function() {
             }
         });
     }
-/*    $('.btn-info').click(function () {
-        var idValue;
-        var modal = "change";
-        idValue = $(this).attr('id');
-        console.log(idValue);
-        $.ajax({
-            type: "POST",
-            url: "view/crud.php",
-            data: {
-                "id" : idValue,
-                "modal" : modal
-            },
-            async: false,
-            success: function ($result) {
-                // console.log($result);
-                $("#modal").html($result);
-                $("#modal").show();
-                console.log("change sucsess");
-            },
-            error: function () {
-                console.log("add data ERROR");
-            }
-        });
-    });
 
-    $('#addForm').click(function () {
-        var modal = "add";
+    function getMoney(){
+        console.log("start money");
         $.ajax({
             type: "POST",
-            url: "view/crud.php",
-            data: {
-                "modal" : modal
-            },
-            async: false,
+            url: "service/updateMoney.php",
+            async: true,
             success: function ($result) {
                 //console.log($result);
-                $("#modal").html($result);
-                $("#modal").show();
-                console.log("modalAdd completed");
+                console.log("Остаток " + $result);
+                $("#money").html($result);
             },
             error: function () {
-                console.log("add data ERROR");
+                console.log("Ошибка получения остатка");
             }
         });
-    });
+    }
 
 
-    $("#addClick").click(function (e) {
-        e.preventDefault();
-        console.log('form add submit clicked');
-        var data_review = $(this).serialize();
-        console.log($(this));
-        $.ajax({
-            type: "POST",
-            url: "view/crud.php",
-            data: data_review,
-           // async: false,
-            success: function () {
-                $("#cancel").click();
-                console.log("add data sucsess");
-            },
-            error: function () {
-                console.log("add data ERROR");
-            }
-        });
-        console.log("end");
-    });*/
+
+        /*    $('.btn-info').click(function () {
+                var idValue;
+                var modal = "change";
+                idValue = $(this).attr('id');
+                console.log(idValue);
+                $.ajax({
+                    type: "POST",
+                    url: "view/crud.php",
+                    data: {
+                        "id" : idValue,
+                        "modal" : modal
+                    },
+                    async: false,
+                    success: function ($result) {
+                        // console.log($result);
+                        $("#modal").html($result);
+                        $("#modal").show();
+                        console.log("change sucsess");
+                    },
+                    error: function () {
+                        console.log("add data ERROR");
+                    }
+                });
+            });
+
+            $('#addForm').click(function () {
+                var modal = "add";
+                $.ajax({
+                    type: "POST",
+                    url: "view/crud.php",
+                    data: {
+                        "modal" : modal
+                    },
+                    async: false,
+                    success: function ($result) {
+                        //console.log($result);
+                        $("#modal").html($result);
+                        $("#modal").show();
+                        console.log("modalAdd completed");
+                    },
+                    error: function () {
+                        console.log("add data ERROR");
+                    }
+                });
+            });
+
+
+            $("#addClick").click(function (e) {
+                e.preventDefault();
+                console.log('form add submit clicked');
+                var data_review = $(this).serialize();
+                console.log($(this));
+                $.ajax({
+                    type: "POST",
+                    url: "view/crud.php",
+                    data: data_review,
+                   // async: false,
+                    success: function () {
+                        $("#cancel").click();
+                        console.log("add data sucsess");
+                    },
+                    error: function () {
+                        console.log("add data ERROR");
+                    }
+                });
+                console.log("end");
+            });*/
 });

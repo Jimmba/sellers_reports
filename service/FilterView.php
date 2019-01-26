@@ -13,6 +13,8 @@ class FilterView{
     private $inputDateTo;
     private $inputMags;
     private $inputProds;
+    private $money;
+
     function __construct($model){
         //include_once($_SERVER['DOCUMENT_ROOT'] . "/service/FilterModel.php");
         //$this->filterModel=new Model();
@@ -31,7 +33,14 @@ class FilterView{
         $this->inputDateFrom = $this->getFromData();
         $this->inputDateTo = $this->getToData();
         $this->inputProds = $this->getProdData($sotr);
+
+        include_once($_SERVER['DOCUMENT_ROOT'] . "/service/Money.php");
+        $this->money = new Money();
+        $this->money = $this->money->getResult();
+
         $this->getView($mags, $sotr);
+
+
     }
 
     /**
@@ -90,11 +99,18 @@ class FilterView{
                         </div>
                     </div>
                 </div>
+               
+               
                 <div class=\"col-xl-6 col-lg-6 col-md-6 col-sm-3 col-xs-2 log-out\">
-                    <button type=\"submit\" class=\"btn btn-danger\">
+                    <button type=\"button\" class=\"btn btn-danger log-out-button\" id=\"logout\">
                         <i class=\"fas fa-sign-out-alt\"></i>
                         <span>Выйти</span>
                     </button>
+                    <div>
+                        <button type=\"button\" class=\"btn btn-info active\">Остаток денежных средств: 
+                            <span class=\"badge badge-light\" id=\"money\">$this->money</span>
+                        </button>
+                    </div>
                 </div>
             </div>
          ";

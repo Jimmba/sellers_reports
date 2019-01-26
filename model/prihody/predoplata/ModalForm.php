@@ -38,7 +38,7 @@ class ModalForm{
         $m = new ArrayOptionsModal;
         $this->predoplaty = $this->getPredoplaty();
         $this->mags=$m->getArray("mag",null);
-        $this->prod=$m->getArray("prod",null);
+        $this->prod=$m->getArray("prod",$_SESSION['id_prod']);
         $this->opisanie=null;
         $this->sumTotal=null;
         $this->sumPredopl=null;
@@ -62,7 +62,7 @@ class ModalForm{
           prihPredoplata.id_prod,
           prihPredoplata.`predoplata(x100)`,
           prihPredoplata.`vsego_k_oplate(x100)`,
-          prihPredoplata.pogasheno
+          prihPredoplata.`pogasheno(x100)`
         FROM prihPredoplata
           INNER JOIN dsm
             ON prihPredoplata.dsm_id_dsm = dsm.id_dsm
@@ -141,7 +141,7 @@ class ModalForm{
           prihPredoplata.`predoplata(x100)`,
           prihPredoplata.`vsego_k_oplate(x100)`
         FROM prihPredoplata
-        WHERE prihPredoplata.pogasheno <> 1
+        WHERE prihPredoplata.`pogasheno(x100)`=0
         ORDER BY prihPredoplata.idprih";
 
         $DBH = new PDO("mysql:host =$host;dbname=$database",$user,$password);
@@ -193,15 +193,15 @@ class ModalForm{
                                     </div>
                                      <div class=\"form-group Input\">
                                         <label for=\"sumTotal\">Всего к оплате</label>
-                                        <input type=\"text\" name = \"sumTotal\" value = \"$this->sumTotal\" class=\"form-control\" id=\"sumTotal\">
+                                        <input type=\"number\" step=\"0.01\" name = \"sumTotal\" value = \"$this->sumTotal\" class=\"form-control\" id=\"sumTotal\">
                                     </div>
                                     <div class=\"form-group input\">
                                         <label for=\"sumPredopl\">Внесено предоплаты</label>
-                                        <input type=\"text\" name = \"sumPredopl\" value = \"$this->sumPredopl\" class=\"form-control\" id=\"sumPredopl\">
+                                        <input type=\"number\" step=\"0.01\" name = \"sumPredopl\" value = \"$this->sumPredopl\" class=\"form-control\" id=\"sumPredopl\">
                                     </div>
                                     <div class=\"form-group input\" type=\"hidden\">
                                         <label for=\"sumOstatok\">Конечный расчет</label>
-                                        <input type=\"text\" name = \"sumOstatok\" class=\"form-control\" id=\"sumOstatok\">
+                                        <input disabled type=\"number\" step=\"0.01\" name = \"sumOstatok\" class=\"form-control\" id=\"sumOstatok\">
                                     </div>
                                     <input type=\"hidden\" name = \"action\" value = \"$this->action\" class=\"form-control\">
                                     <input type=\"hidden\" name = \"id\" value = \"$this->changeId\" class=\"form-control\">
@@ -297,7 +297,7 @@ class ModalForm{
                                     $('#opisanie').prop('disabled', false);
                                     $('#sumTotal').prop('disabled', false);
                                     $('#sumPredopl').prop('disabled', false);
-                                    $('#sumOstatok').prop('disabled', false);
+                                    $('#sumOstatok').prop('disabled', true);
                                 }
                             }
                         });

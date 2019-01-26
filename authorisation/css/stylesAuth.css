@@ -1,0 +1,8 @@
+.registration-form, .forgot-password-form {
+    display: none;
+}
+@media screen and (max-width: 576px){
+    .btn {
+        margin-bottom: 10px;
+    }
+}
